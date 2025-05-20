@@ -2,8 +2,7 @@
 
 This is a simple, public domain extension so you can play with marching cubes quickly and easily.
 
-Inline-style: 
-(https://github.com/TheoLomeuBraga/theo_marching_cubes_extension/blob/master/MC_demo.png "marching cubes demo demo")
+![alt text](https://github.com/TheoLomeuBraga/theo_marching_cubes_extension/blob/master/MC_demo.png "marching cubes demo demo")
 
 ## EXAMPLE:
 
@@ -32,6 +31,7 @@ func _ready() -> void:
 
 ## TODO: 
 Add threading support
+Add documentation
 
 ## CREDITS:
 https://github.com/aparis69/MarchingCubeCpp
