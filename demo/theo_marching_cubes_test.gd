@@ -6,7 +6,6 @@ func _ready() -> void:
 	grid_size = Vector3i(100,100,100)
 	use_collision = true
 	
-	
 	for i in range(10,90):
 		var begin : int = i + 0
 		var end : int = i + 8

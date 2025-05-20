@@ -30,8 +30,8 @@ func _ready() -> void:
 ```
 
 ## TODO: 
-Add threading support
-Add documentation
+* Add threading support
+* Add documentation
 
 ## CREDITS:
 https://github.com/aparis69/MarchingCubeCpp
