@@ -17,5 +17,3 @@ func _ready() -> void:
 						set_volume_type_on_area(Vector3i(x,y,z),1)
 					else:
 						set_volume_type_on_area(Vector3i(x,y,z),-1)
-	
-	force_update()
