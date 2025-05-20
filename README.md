@@ -30,6 +30,7 @@ func _ready() -> void:
 ```
 
 ## TODO: 
+* Add multiple material support
 * Add threading support
 * Add nav mesh suport
 * Add documentation
