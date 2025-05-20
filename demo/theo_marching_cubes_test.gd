@@ -14,6 +14,6 @@ func _ready() -> void:
 			for y in range(begin,end):
 				for z in range(begin,end):
 					if x % 3 == 0:
-						set_volume_type_on_area(Vector3i(x,y,z),1)
-					else:
 						set_volume_type_on_area(Vector3i(x,y,z),-1)
+					else:
+						set_volume_type_on_area(Vector3i(x,y,z),0)
