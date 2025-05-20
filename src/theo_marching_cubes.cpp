@@ -199,8 +199,6 @@ void TheoMarchingCubes::process_TheoMarchingCubes()
 		_surface_tool->add_vertex(Vector3(marching_cubes_mesh.vertices[i].x, marching_cubes_mesh.vertices[i].y, marching_cubes_mesh.vertices[i].z));
 	}
 
-	print_line("material is valid: ",material.is_valid());
-
 	if (material.is_valid())
 	{
 		_surface_tool->set_material(material);

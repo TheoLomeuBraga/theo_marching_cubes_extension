@@ -2,3 +2,6 @@
 !/demo/bin/theo_marching_cubes_extension.gdextension
 
 /godot.linuxbsd.editor.x86_64
+
+/src/register_types.os
+/src/theo_marching_cubes.os
