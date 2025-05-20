@@ -4,7 +4,7 @@ extends TheoMarchingCubes
 func _ready() -> void:
 	
 	grid_size = Vector3i(100,100,100)
-	
+	use_collision = true
 	
 	
 	for i in range(10,90):
@@ -16,6 +16,6 @@ func _ready() -> void:
 					if x % 3 == 0:
 						set_volume_type_on_area(Vector3i(x,y,z),1)
 					else:
-						set_volume_type_on_area(Vector3i(x,y,z),0)
+						set_volume_type_on_area(Vector3i(x,y,z),-1)
 	
 	force_update()

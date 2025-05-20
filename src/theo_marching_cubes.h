@@ -3,6 +3,7 @@
 
 #include <godot_cpp/classes/material.hpp>
 #include <godot_cpp/classes/geometry_instance3d.hpp>
+#include <godot_cpp/classes/visual_instance3d.hpp>
 #include <godot_cpp/classes/surface_tool.hpp>
 #include <godot_cpp/classes/concave_polygon_shape3d.hpp>
 
@@ -30,13 +31,33 @@ namespace godot
 
 		bool threaded;
 
+		bool use_collision = false;
+		uint32_t collision_layer = 1;
+		uint32_t collision_mask = 1;
+		real_t collision_priority = 1.0;
+		Ref<ConcavePolygonShape3D> root_collision_shape;
+		RID root_collision_instance;
+
+		RID root_collision_debug_instance;
+		Transform3D debug_shape_old_transform;
+
+
+
 	public:
 		TheoMarchingCubes();
 		~TheoMarchingCubes();
 
+		void _update_collision_faces();
+		bool _is_debug_collision_shape_visible();
+		void _update_debug_collision_shape();
+		void _clear_debug_collision_shape();
+		void _on_transform_changed();
+		PackedVector3Array _get_brush_collision_faces();
+
 		void process_TheoMarchingCubes();
 
 		void _process(double delta) override;
+		void _notification(int p_what);
 
 		// grid
 		void set_grid_size(const Vector3i &p_size);
