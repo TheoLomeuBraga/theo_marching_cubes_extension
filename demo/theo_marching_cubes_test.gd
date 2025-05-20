@@ -1,11 +1,10 @@
-@tool
+
 extends TheoMarchingCubes
 
-func generate() -> void:
+func _ready() -> void:
 	
 	grid_size = Vector3i(100,100,100)
 	use_collision = true
-	
 	
 	for i in range(10,90):
 		
@@ -25,10 +24,4 @@ func generate() -> void:
 				for z in range(5,95):
 					set_volume_type_on_area(Vector3i(x,y,z),0)
 
-@export_tool_button("generate", "Callable") var generate_action = generate
  
-
-func _ready() -> void:
-	
-	if not Engine.is_editor_hint():
-		generate()
