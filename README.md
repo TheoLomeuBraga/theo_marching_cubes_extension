@@ -31,6 +31,7 @@ func _ready() -> void:
 
 ## TODO: 
 * Add threading support
+* Add nav mesh suport
 * Add documentation
 
 ## CREDITS:

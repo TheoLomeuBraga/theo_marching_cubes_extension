@@ -24,7 +24,7 @@ namespace godot
 
 		bool has_changed;
 		Vector3 grid_size;
-		MC::MC_FLOAT* _field_data;
+		MC::MC_FLOAT* _field_data = NULL;
 		Ref<SurfaceTool> _surface_tool;
 		Ref<ArrayMesh> _mesh;
 		Ref<Material> material;

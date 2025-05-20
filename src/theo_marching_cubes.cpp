@@ -23,7 +23,10 @@ void TheoMarchingCubes::clean_grid_data(const Vector3i &size, MC::MC_FLOAT *data
 
 void TheoMarchingCubes::clean_grid()
 {
-	clean_grid_data(grid_size, _field_data);
+	if (_field_data != NULL)
+	{
+		clean_grid_data(grid_size, _field_data);
+	}
 }
 
 void TheoMarchingCubes::_bind_methods()
@@ -41,7 +44,6 @@ void TheoMarchingCubes::_bind_methods()
 	ClassDB::bind_method(D_METHOD("get_material"), &TheoMarchingCubes::get_material);
 	ClassDB::bind_method(D_METHOD("set_material", "p_material"), &TheoMarchingCubes::set_material);
 	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "material", PROPERTY_HINT_RESOURCE_TYPE, "BaseMaterial3D,ShaderMaterial"), "set_material", "get_material");
-	
 
 	// colision
 
@@ -87,6 +89,7 @@ TheoMarchingCubes::~TheoMarchingCubes()
 {
 	// Add your cleanup here.
 	delete _field_data;
+	_field_data = NULL;
 }
 
 void TheoMarchingCubes::set_grid_size(const Vector3i &p_size)
@@ -97,7 +100,10 @@ void TheoMarchingCubes::set_grid_size(const Vector3i &p_size)
 
 	// TODO: transference
 
-	delete _field_data;
+	if(_field_data != NULL){
+		delete _field_data;
+	}
+	
 	_field_data = new_field_data;
 
 	grid_size = p_size;
@@ -116,7 +122,7 @@ bool TheoMarchingCubes::is_cord_valid(const Vector3i &p_position) const
 
 void TheoMarchingCubes::set_volume_type_on_area(const Vector3i &p_position, int p_volume)
 {
-
+	
 	if (_field_data != NULL && is_cord_valid(p_position))
 	{
 		int32_t index = (p_position.z * grid_size.y * grid_size.x) + (p_position.y * grid_size.x) + p_position.x;
@@ -144,26 +150,31 @@ int TheoMarchingCubes::get_volume_type_on_area(const Vector3i &p_position) const
 	}
 }
 
-
-void TheoMarchingCubes::_clear_debug_collision_shape() {
-	if (root_collision_debug_instance.is_valid()) {
+void TheoMarchingCubes::_clear_debug_collision_shape()
+{
+	if (root_collision_debug_instance.is_valid())
+	{
 		RenderingServer::get_singleton()->free_rid(root_collision_debug_instance);
 		root_collision_debug_instance = RID();
 	}
 }
 
-bool TheoMarchingCubes::_is_debug_collision_shape_visible() {
+bool TheoMarchingCubes::_is_debug_collision_shape_visible()
+{
 	return !Engine::get_singleton()->is_editor_hint() && is_inside_tree() && get_tree()->is_debugging_collisions_hint();
 }
 
-void TheoMarchingCubes::_update_debug_collision_shape() {
-	if (!use_collision || root_collision_shape.is_null() || !_is_debug_collision_shape_visible()) {
+void TheoMarchingCubes::_update_debug_collision_shape()
+{
+	if (!use_collision || root_collision_shape.is_null() || !_is_debug_collision_shape_visible())
+	{
 		return;
 	}
 
 	ERR_FAIL_NULL(RenderingServer::get_singleton());
 
-	if (root_collision_debug_instance.is_valid()) {
+	if (root_collision_debug_instance.is_valid())
+	{
 		root_collision_debug_instance = RenderingServer::get_singleton()->instance_create();
 	}
 
@@ -175,47 +186,58 @@ void TheoMarchingCubes::_update_debug_collision_shape() {
 
 void TheoMarchingCubes::process_TheoMarchingCubes()
 {
-
-	MC::mcMesh marching_cubes_mesh;
-	MC::marching_cube(_field_data, grid_size.x, grid_size.y, grid_size.z, marching_cubes_mesh);
-
-	if (_surface_tool.is_valid())
+	
+	if (_field_data != NULL)
 	{
-		_surface_tool.unref();
+
+		MC::mcMesh marching_cubes_mesh;
+		MC::marching_cube(_field_data, grid_size.x, grid_size.y, grid_size.z, marching_cubes_mesh);
+
+		
+
+		if (_surface_tool.is_valid())
+		{
+			_surface_tool.unref();
+		}
+		_surface_tool.instantiate();
+
+		if (_mesh.is_valid())
+		{
+			_mesh.unref();
+		}
+		_mesh.instantiate();
+
+		_surface_tool->begin(Mesh::PrimitiveType::PRIMITIVE_TRIANGLES);
+
+		for (int i = 0; i < marching_cubes_mesh.vertices.size(); i++)
+		{
+			_surface_tool->set_normal(Vector3(-marching_cubes_mesh.normals[i].x, -marching_cubes_mesh.normals[i].y, -marching_cubes_mesh.normals[i].z));
+			_surface_tool->add_vertex(Vector3(marching_cubes_mesh.vertices[i].x, marching_cubes_mesh.vertices[i].y, marching_cubes_mesh.vertices[i].z));
+		}
+
+		if (material.is_valid())
+		{
+			_surface_tool->set_material(material);
+		}
+
+		for (int i = 0; i < marching_cubes_mesh.indices.size(); i++)
+		{
+			_surface_tool->add_index(marching_cubes_mesh.indices[i]);
+		}
+
+		_surface_tool->commit(_mesh);
+
+		set_base(_mesh->get_rid());
+
+		
+		_update_collision_faces();
+
+		if (_is_debug_collision_shape_visible()) {
+			_update_debug_collision_shape();
+		}
+
+		has_changed = false;
 	}
-	_surface_tool.instantiate();
-
-	if (_mesh.is_valid())
-	{
-		_mesh.unref();
-	}
-	_mesh.instantiate();
-
-	_surface_tool->begin(Mesh::PrimitiveType::PRIMITIVE_TRIANGLES);
-
-	for (int i = 0; i < marching_cubes_mesh.vertices.size(); i++)
-	{
-		_surface_tool->set_normal(Vector3(-marching_cubes_mesh.normals[i].x, -marching_cubes_mesh.normals[i].y, -marching_cubes_mesh.normals[i].z));
-		_surface_tool->add_vertex(Vector3(marching_cubes_mesh.vertices[i].x, marching_cubes_mesh.vertices[i].y, marching_cubes_mesh.vertices[i].z));
-	}
-
-	if (material.is_valid())
-	{
-		_surface_tool->set_material(material);
-	}
-
-	for (int i = 0; i < marching_cubes_mesh.indices.size(); i++)
-	{
-		_surface_tool->add_index(marching_cubes_mesh.indices[i]);
-	}
-
-	_surface_tool->commit(_mesh);
-
-	set_base(_mesh->get_rid());
-
-	_update_collision_faces();
-
-	has_changed = false;
 }
 
 Ref<Material> TheoMarchingCubes::get_material() const
@@ -229,19 +251,22 @@ void TheoMarchingCubes::set_material(const Ref<Material> &mats)
 	has_changed = true;
 }
 
-
-void TheoMarchingCubes::set_use_collision(bool p_enable) {
-	if (use_collision == p_enable) {
+void TheoMarchingCubes::set_use_collision(bool p_enable)
+{
+	if (use_collision == p_enable)
+	{
 		return;
 	}
 
 	use_collision = p_enable;
 
-	if (!is_inside_tree()) {
+	if (!is_inside_tree())
+	{
 		return;
 	}
 
-	if (use_collision) {
+	if (use_collision)
+	{
 		root_collision_shape.instantiate();
 		root_collision_instance = PhysicsServer3D::get_singleton()->body_create();
 		PhysicsServer3D::get_singleton()->body_set_mode(root_collision_instance, PhysicsServer3D::BODY_MODE_STATIC);
@@ -253,7 +278,9 @@ void TheoMarchingCubes::set_use_collision(bool p_enable) {
 		set_collision_mask(collision_mask);
 		set_collision_priority(collision_priority);
 		process_TheoMarchingCubes();
-	} else {
+	}
+	else
+	{
 		PhysicsServer3D::get_singleton()->free_rid(root_collision_instance);
 		root_collision_instance = RID();
 		root_collision_shape.unref();
@@ -357,11 +384,8 @@ RID TheoMarchingCubes::_get_root_collision_instance() const
 	return RID();
 }
 
-/*
-
-*/
-
-PackedVector3Array TheoMarchingCubes::_get_brush_collision_faces() {
+PackedVector3Array TheoMarchingCubes::_get_brush_collision_faces()
+{
 
 	PackedVector3Array collision_faces;
 
@@ -398,11 +422,14 @@ PackedVector3Array TheoMarchingCubes::_get_brush_collision_faces() {
 	return collision_faces;
 }
 
-void TheoMarchingCubes::_update_collision_faces() {
-	if (use_collision && root_collision_shape.is_valid()) {
+void TheoMarchingCubes::_update_collision_faces()
+{
+	if (use_collision && root_collision_shape.is_valid())
+	{
 		root_collision_shape->set_faces(_get_brush_collision_faces());
 
-		if (_is_debug_collision_shape_visible()) {
+		if (_is_debug_collision_shape_visible())
+		{
 			_update_debug_collision_shape();
 		}
 	}
@@ -451,8 +478,10 @@ Ref<ConcavePolygonShape3D> TheoMarchingCubes::bake_collision_shape()
 	return root_collision_shape;
 }
 
-void TheoMarchingCubes::_on_transform_changed() {
-	if (root_collision_debug_instance.is_valid() && !debug_shape_old_transform.is_equal_approx(get_global_transform())) {
+void TheoMarchingCubes::_on_transform_changed()
+{
+	if (root_collision_debug_instance.is_valid() && !debug_shape_old_transform.is_equal_approx(get_global_transform()))
+	{
 		debug_shape_old_transform = get_global_transform();
 		RenderingServer::get_singleton()->instance_set_transform(root_collision_debug_instance, debug_shape_old_transform);
 	}
@@ -460,43 +489,51 @@ void TheoMarchingCubes::_on_transform_changed() {
 
 void TheoMarchingCubes::_notification(int p_what)
 {
-	
-	switch (p_what) {
-		case NOTIFICATION_ENTER_TREE: {
-			
-			if (use_collision) {
-				root_collision_shape.instantiate();
-				root_collision_instance = PhysicsServer3D::get_singleton()->body_create();
-				PhysicsServer3D::get_singleton()->body_set_mode(root_collision_instance, PhysicsServer3D::BODY_MODE_STATIC);
-				PhysicsServer3D::get_singleton()->body_set_state(root_collision_instance, PhysicsServer3D::BODY_STATE_TRANSFORM, get_global_transform());
-				PhysicsServer3D::get_singleton()->body_add_shape(root_collision_instance, root_collision_shape->get_rid());
-				PhysicsServer3D::get_singleton()->body_set_space(root_collision_instance, get_world_3d()->get_space());
-				PhysicsServer3D::get_singleton()->body_attach_object_instance_id(root_collision_instance, get_instance_id());
-				set_collision_layer(collision_layer);
-				set_collision_mask(collision_mask);
-				set_collision_priority(collision_priority);
-				process_TheoMarchingCubes();
-			}
-		} break;
 
-		case NOTIFICATION_EXIT_TREE: {
-			if (use_collision && root_collision_instance.is_valid()) {
-				PhysicsServer3D::get_singleton()->free_rid(root_collision_instance);
-				root_collision_instance = RID();
-				root_collision_shape.unref();
-			}
-		} break;
+	switch (p_what)
+	{
+	case NOTIFICATION_ENTER_TREE:
+	{
 
-		case NOTIFICATION_TRANSFORM_CHANGED: {
-			if (use_collision && root_collision_instance.is_valid()) {
-				PhysicsServer3D::get_singleton()->body_set_state(root_collision_instance, PhysicsServer3D::BODY_STATE_TRANSFORM, get_global_transform());
-			}
-			_on_transform_changed();
-		} break;
+		if (use_collision)
+		{
+			root_collision_shape.instantiate();
+			root_collision_instance = PhysicsServer3D::get_singleton()->body_create();
+			PhysicsServer3D::get_singleton()->body_set_mode(root_collision_instance, PhysicsServer3D::BODY_MODE_STATIC);
+			PhysicsServer3D::get_singleton()->body_set_state(root_collision_instance, PhysicsServer3D::BODY_STATE_TRANSFORM, get_global_transform());
+			PhysicsServer3D::get_singleton()->body_add_shape(root_collision_instance, root_collision_shape->get_rid());
+			PhysicsServer3D::get_singleton()->body_set_space(root_collision_instance, get_world_3d()->get_space());
+			PhysicsServer3D::get_singleton()->body_attach_object_instance_id(root_collision_instance, get_instance_id());
+			set_collision_layer(collision_layer);
+			set_collision_mask(collision_mask);
+			set_collision_priority(collision_priority);
+			process_TheoMarchingCubes();
+		}
 	}
-	
-}
+	break;
 
+	case NOTIFICATION_EXIT_TREE:
+	{
+		if (use_collision && root_collision_instance.is_valid())
+		{
+			PhysicsServer3D::get_singleton()->free_rid(root_collision_instance);
+			root_collision_instance = RID();
+			root_collision_shape.unref();
+		}
+	}
+	break;
+
+	case NOTIFICATION_TRANSFORM_CHANGED:
+	{
+		if (use_collision && root_collision_instance.is_valid())
+		{
+			PhysicsServer3D::get_singleton()->body_set_state(root_collision_instance, PhysicsServer3D::BODY_STATE_TRANSFORM, get_global_transform());
+		}
+		_on_transform_changed();
+	}
+	break;
+	}
+}
 
 void TheoMarchingCubes::_process(double delta)
 {
