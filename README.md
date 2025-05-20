@@ -3,7 +3,7 @@
 This is a simple, public domain extension so you can play with marching cubes quickly and easily.
 
 Inline-style: 
-![alt text](https://github.com/TheoLomeuBraga/theo_marching_cubes_extension/master/MC_demo.png "marching cubes demo demo")
+![alt text](https://github.com/TheoLomeuBraga/theo_marching_cubes_extension/blob/master/MC_demo.png "marching cubes demo demo")
 
 ```gdscript
 
