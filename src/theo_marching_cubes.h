@@ -4,7 +4,7 @@
 #include <godot_cpp/classes/material.hpp>
 #include <godot_cpp/classes/geometry_instance3d.hpp>
 #include <godot_cpp/classes/surface_tool.hpp>
-#include <godot_cpp/variant/typed_array.hpp>
+#include <godot_cpp/classes/concave_polygon_shape3d.hpp>
 
 #include "MarchingCubeCpp/MC.h"
 
@@ -26,7 +26,9 @@ namespace godot
 		MC::MC_FLOAT* _field_data;
 		Ref<SurfaceTool> _surface_tool;
 		Ref<ArrayMesh> _mesh;
-		TypedArray<Material> material_array;
+		Ref<Material> material;
+
+		bool threaded;
 
 	public:
 		TheoMarchingCubes();
@@ -48,27 +50,29 @@ namespace godot
 		void set_volume_type_on_area(const Vector3i &p_position, int p_volume);
 		int get_volume_type_on_area(const Vector3i &p_position) const;
 
-		// geometry
-		//void set_smooth_faces(bool p_smooth_faces);
-		//bool get_smooth_faces() const;
+		// thread
+		//bool get_mult_thread() const;
+		//void set_mult_thread(const bool &is_threaded);
 
 		// material
-		TypedArray<Material> get_material_array() const;
-		void set_material_array(const TypedArray<Material> &mats);
+		Ref<Material> get_material() const;
+		void set_material(const Ref<Material> &mats);
 
 		// collision
-		//void set_use_collision(bool p_operation);
-		//bool is_using_collision() const;
-		//void set_collision_layer(uint32_t p_layer);
-		//uint32_t get_collision_layer() const;
-		//void set_collision_mask(uint32_t p_mask);
-		//uint32_t get_collision_mask() const;
-		//void set_collision_mask_value(int32_t p_layer_number, bool p_value);
-		//bool get_collision_mask_value(int32_t p_layer_number) const;
-		//void set_collision_layer_value(int32_t p_layer_number, bool p_value);
-		//bool get_collision_layer_value(int32_t p_layer_number) const;
-		//void set_collision_priority(float p_priority);
-		//float get_collision_priority() const;
+		void set_use_collision(bool p_operation);
+		bool is_using_collision() const;
+		void set_collision_layer(uint32_t p_layer);
+		uint32_t get_collision_layer() const;
+		void set_collision_mask(uint32_t p_mask);
+		uint32_t get_collision_mask() const;
+		void set_collision_mask_value(int32_t p_layer_number, bool p_value);
+		bool get_collision_mask_value(int32_t p_layer_number) const;
+		void set_collision_layer_value(int32_t p_layer_number, bool p_value);
+		bool get_collision_layer_value(int32_t p_layer_number) const;
+		void set_collision_priority(float p_priority);
+		float get_collision_priority() const;
+		RID _get_root_collision_instance() const;
+		Ref<ConcavePolygonShape3D> bake_collision_shape();
 	};
 
 }

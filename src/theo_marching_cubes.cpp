@@ -6,11 +6,9 @@
 #include "MarchingCubeCpp/MC.h"
 
 #include <godot_cpp/core/print_string.hpp>
-#include <godot_cpp/variant/typed_array.hpp>
 
 using namespace godot;
 
-#include <godot_cpp/templates/hash_map.hpp>
 
 void TheoMarchingCubes::clean_grid_data(const Vector3i &size, MC::MC_FLOAT* data){
 	for(int i = 0 ; i < size.x * size.y * size.z ; i++){
@@ -35,11 +33,46 @@ void TheoMarchingCubes::_bind_methods()
 	ClassDB::bind_method(D_METHOD("force_update"), &TheoMarchingCubes::process_TheoMarchingCubes);
 	ClassDB::bind_method(D_METHOD("clean_grid"), &TheoMarchingCubes::clean_grid);
 
-	ClassDB::bind_method(D_METHOD("get_material_array"), &TheoMarchingCubes::get_material_array);
-	ClassDB::bind_method(D_METHOD("set_material_array", "p_material"), &TheoMarchingCubes::set_material_array);
-	ADD_PROPERTY(PropertyInfo(Variant::ARRAY, "material_array", PROPERTY_HINT_ARRAY_TYPE, "Material"), "set_material_array", "get_material_array");
-	//ADD_PROPERTY(PropertyInfo(Variant::ARRAY, "material_array", PROPERTY_HINT_TYPE_STRING,String::num(Variant::OBJECT) + "/" + String::num(PROPERTY_HINT_RESOURCE_TYPE) + "Material"), "set_material_array", "get_material_array");
+	ClassDB::bind_method(D_METHOD("get_material"), &TheoMarchingCubes::get_material);
+	ClassDB::bind_method(D_METHOD("set_material", "p_material"), &TheoMarchingCubes::set_material);
+	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "material", PROPERTY_HINT_RESOURCE_TYPE, "Material"), "set_material", "get_material");
 
+	//colision
+
+	ADD_GROUP("Collision", "collision_");
+
+	ClassDB::bind_method(D_METHOD("set_use_collision", "operation"), &TheoMarchingCubes::set_use_collision);
+	ClassDB::bind_method(D_METHOD("is_using_collision"), &TheoMarchingCubes::is_using_collision);
+	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "use_collision"), "set_use_collision", "is_using_collision");
+
+	ClassDB::bind_method(D_METHOD("set_collision_layer", "layer"), &TheoMarchingCubes::set_collision_layer);
+	ClassDB::bind_method(D_METHOD("get_collision_layer"), &TheoMarchingCubes::get_collision_layer);
+	ADD_PROPERTY(PropertyInfo(Variant::INT, "collision_layer", PROPERTY_HINT_LAYERS_3D_PHYSICS), "set_collision_layer", "get_collision_layer");
+
+	ClassDB::bind_method(D_METHOD("set_collision_mask", "mask"), &TheoMarchingCubes::set_collision_mask);
+	ClassDB::bind_method(D_METHOD("get_collision_mask"), &TheoMarchingCubes::get_collision_mask);
+
+	ClassDB::bind_method(D_METHOD("set_collision_mask_value", "layer_number", "value"), &TheoMarchingCubes::set_collision_mask_value);
+	ClassDB::bind_method(D_METHOD("get_collision_mask_value", "layer_number"), &TheoMarchingCubes::get_collision_mask_value);
+
+	ADD_PROPERTY(PropertyInfo(Variant::INT, "collision_mask", PROPERTY_HINT_LAYERS_3D_PHYSICS), "set_collision_mask", "get_collision_mask");
+
+	ClassDB::bind_method(D_METHOD("set_collision_layer_value", "layer_number", "value"), &TheoMarchingCubes::set_collision_layer_value);
+	ClassDB::bind_method(D_METHOD("get_collision_layer_value", "layer_number"), &TheoMarchingCubes::get_collision_layer_value);
+
+	ClassDB::bind_method(D_METHOD("set_collision_priority", "priority"), &TheoMarchingCubes::set_collision_priority);
+	ClassDB::bind_method(D_METHOD("get_collision_priority"), &TheoMarchingCubes::get_collision_priority);
+	ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "collision_priority"), "set_collision_priority", "get_collision_priority");
+	
+	ClassDB::bind_method(D_METHOD("bake_collision_shape"), &TheoMarchingCubes::bake_collision_shape);
+	ClassDB::bind_method(D_METHOD("_get_root_collision_instance"), &TheoMarchingCubes::_get_root_collision_instance);
+
+	
+	
+	
+	
+	
+	
 }
 
 TheoMarchingCubes::TheoMarchingCubes()
@@ -121,8 +154,6 @@ void TheoMarchingCubes::process_TheoMarchingCubes()
 	MC::mcMesh marching_cubes_mesh;
 	MC::marching_cube(_field_data, grid_size.x, grid_size.y, grid_size.z, marching_cubes_mesh);
 
-	//HashMap<int, MC::mcMesh> surfaces;
-
 	if (_surface_tool.is_valid()){
 		_surface_tool.unref();
 	}
@@ -141,8 +172,8 @@ void TheoMarchingCubes::process_TheoMarchingCubes()
 		_surface_tool->add_vertex(Vector3(marching_cubes_mesh.vertices[i].x, marching_cubes_mesh.vertices[i].y, marching_cubes_mesh.vertices[i].z));
 	}
 
-	if(material_array.size() >= 0){
-		_surface_tool->set_material(material_array.get(0));
+	if(material.is_valid()){
+		_surface_tool->set_material(material);
 	}
 
 	int last_material_id = -1;
@@ -162,14 +193,29 @@ void TheoMarchingCubes::process_TheoMarchingCubes()
 	
 }
 
-TypedArray<Material> TheoMarchingCubes::get_material_array() const {
-	return material_array;
+Ref<Material> TheoMarchingCubes::get_material() const {
+	return material;
 }
 
-void TheoMarchingCubes::set_material_array(const TypedArray<Material> &mats){
-	material_array = mats;
+void TheoMarchingCubes::set_material(const Ref<Material> &mats){
+	material = mats;
 	has_changed = true;
 }
+
+void TheoMarchingCubes::set_use_collision(bool p_operation){}
+bool TheoMarchingCubes::is_using_collision() const {return false;}
+void TheoMarchingCubes::set_collision_layer(uint32_t p_layer){}
+uint32_t TheoMarchingCubes::get_collision_layer() const{return 0;}
+void TheoMarchingCubes::set_collision_mask(uint32_t p_mask){}
+uint32_t TheoMarchingCubes::get_collision_mask() const{return 0;}
+void TheoMarchingCubes::set_collision_mask_value(int32_t p_layer_number, bool p_value){}
+bool TheoMarchingCubes::get_collision_mask_value(int32_t p_layer_number) const {return false;}
+void TheoMarchingCubes::set_collision_layer_value(int32_t p_layer_number, bool p_value){}
+bool TheoMarchingCubes::get_collision_layer_value(int32_t p_layer_number) const{return false;}
+void TheoMarchingCubes::set_collision_priority(float p_priority){}
+float TheoMarchingCubes::get_collision_priority() const{return 0.0f;}
+RID TheoMarchingCubes::_get_root_collision_instance() const {return RID();}
+Ref<ConcavePolygonShape3D> TheoMarchingCubes::bake_collision_shape() {return Ref<ConcavePolygonShape3D>();}
 
 void TheoMarchingCubes::_process(double delta)
 {

@@ -1,10 +1,7 @@
 
 extends TheoMarchingCubes
 
-@export var materials : Array[Material]
 func _ready() -> void:
-	
-	material_array = materials
 	
 	grid_size = Vector3i(100,100,100)
 	
