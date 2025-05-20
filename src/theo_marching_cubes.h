@@ -4,28 +4,28 @@
 #include <godot_cpp/classes/material.hpp>
 #include <godot_cpp/classes/geometry_instance3d.hpp>
 #include <godot_cpp/classes/surface_tool.hpp>
+#include <godot_cpp/variant/typed_array.hpp>
 
 #include "MarchingCubeCpp/MC.h"
 
 namespace godot
 {
+	
 
 	class TheoMarchingCubes : public GeometryInstance3D
 	{
 		GDCLASS(TheoMarchingCubes, GeometryInstance3D)
+		
 
 	private:
 	protected:
 		static void _bind_methods();
 
 		bool has_changed;
-
 		Vector3 grid_size;
-
 		MC::MC_FLOAT* _field_data;
 		Ref<SurfaceTool> _surface_tool;
 		Ref<ArrayMesh> _mesh;
-
 		TypedArray<Material> material_array;
 
 	public:
@@ -45,14 +45,8 @@ namespace godot
 		void clean_grid();
 
 		// volume
-		void set_volume_on_area(const Vector3i &p_position, float p_volume);
-		float get_volume_on_area(const Vector3i &p_position) const;
-		void set_volume_type_on_area(const Vector3i &p_position, int32_t p_volume_type);
-		int32_t get_volume_type_on_area(const Vector3i &p_position) const;
-
-		//test
-		Ref<Mesh> get_mesh() const;
-		void set_mesh(const Ref<Mesh> &p_mesh);
+		void set_volume_type_on_area(const Vector3i &p_position, int p_volume);
+		int get_volume_type_on_area(const Vector3i &p_position) const;
 
 		// geometry
 		//void set_smooth_faces(bool p_smooth_faces);

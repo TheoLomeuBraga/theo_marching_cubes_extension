@@ -79,6 +79,7 @@ namespace MC
 		std::vector<mcVec3f> vertices;
 		std::vector<mcVec3f> normals;
 		std::vector<muint> indices;
+		std::vector<muint> types;
 	} mcMesh;
 
 	void marching_cube(MC_FLOAT* field, muint nx, muint ny, muint nz, mcMesh& outputMesh);
@@ -240,6 +241,7 @@ namespace MC
 		outputMesh.vertices.reserve(defaultVerticeArraySize);
 		outputMesh.normals.reserve(defaultNormalArraySize);
 		outputMesh.indices.reserve(defaultTriangleArraySize);
+		outputMesh.types.reserve(defaultTriangleArraySize);
 
 		const mcVec3i size = {{{ nx, ny, nz }}};
 		mcVec3i* slab_inds = new mcVec3i[nx * ny * 2];
@@ -318,6 +320,7 @@ namespace MC
 					{
 						const int edge = (config >> offset) & 0xF;
 						outputMesh.indices.push_back(edge_indices[edge]);
+						outputMesh.types.push_back(vs[0]);
 						offset += 4;
 					}
 					for (size_t i = 0; i < n_triangles; i++)

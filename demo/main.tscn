@@ -1,4 +1,4 @@
-[gd_scene load_steps=6 format=3 uid="uid://dcqx1aqtlx0ic"]
+[gd_scene load_steps=8 format=3 uid="uid://dcqx1aqtlx0ic"]
 
 [ext_resource type="Script" uid="uid://boxgwko7eksnu" path="res://free_camera.gd" id="1_0xm2m"]
 [ext_resource type="Script" uid="uid://dnc6i0ygc2671" path="res://theo_marching_cubes_test.gd" id="1_ig7tw"]
@@ -10,6 +10,12 @@ ambient_light_color = Color(0.201527, 0.201527, 0.201527, 1)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_0xm2m"]
 albedo_color = Color(0, 1, 1, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_h2yge"]
+albedo_color = Color(1, 1, 0, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_1bvp3"]
+albedo_color = Color(1, 0, 1, 1)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_0xm2m"]
 size = Vector3(20, 20, 20)
@@ -32,7 +38,7 @@ transform = Transform3D(1, 0, 0, 0, 0, 1, 0, -1, 0, 0, 0, 0)
 [node name="TheoMarchingCubes" type="TheoMarchingCubes" parent="."]
 transform = Transform3D(-0.308754, 0, -0.951142, 0, 1, 0, 0.951142, 0, -0.308754, 0, 0, 0)
 script = ExtResource("1_ig7tw")
-materials = Array[Material]([SubResource("StandardMaterial3D_0xm2m")])
+materials = Array[Material]([SubResource("StandardMaterial3D_0xm2m"), SubResource("StandardMaterial3D_h2yge"), SubResource("StandardMaterial3D_1bvp3")])
 
 [node name="RigidBody3D" type="RigidBody3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -50, 80, 20)
